@@ -12,6 +12,8 @@ const {userAuth} = require('./middlewares/userAuth.js');
 
 
 //Initialize the app
+const app = express();
+
 app.use(express.json());
 // below middleware parses the cookie in object format
 app.use(cookieParser());
