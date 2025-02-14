@@ -61,7 +61,7 @@ app.post("/login", async (req, res) => {
 
         if (isPasswordValid) {
             //Get the Token
-            const token = user.getJWTToken();
+            const token = await user.getJWTToken();
             //Add the token in a cookie and send the response back
             res.cookie("token", token , {
                 expires : new Date(Date.now() + 8*3600000)
