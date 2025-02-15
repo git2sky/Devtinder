@@ -17,6 +17,15 @@ const validator = require('validator');
 
 }
 
+const validateProfileEditData = (req) => {
+    const alloweField = ["firstName", "lastName", "age", "skills", "gender"];
+    const isEditAllowed = Object.keys(req.body).every(field => {
+        return alloweField.includes(field);
+    });
+    return isEditAllowed;
+}
+
 module.exports = {
-    validateSignupData
+    validateSignupData,
+    validateProfileEditData
 };
