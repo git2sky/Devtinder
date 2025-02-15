@@ -63,5 +63,14 @@ authRouter.post("/login", async (req, res) => {
     }
 });
 
+// logout means expire the token in the cookie right now
+authRouter.post('/logout', (req,res)=>{
+    //First do all the cleanup activity the expire the cookie
+    res.cookie('token', null,{
+        expires : new Date(Date.now())
+    });
+    res.status(200).send("User logged out");
+})
+
 
 module.exports = authRouter;
