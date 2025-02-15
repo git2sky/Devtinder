@@ -3,6 +3,7 @@ const { validateSignupData } = require('../utils/validateProfileData.js');
 const bcrypt = require('bcrypt');
 const User = require('../models/user.js');
 const validator = require('validator');
+const {userAuth} = require('../middlewares/userAuth.js');
 
 const authRouter = express.Router();
 
@@ -45,7 +46,7 @@ authRouter.post("/login", async (req, res) => {
             throw new Error("Invalid Credential!");
         }
 
-        const isPasswordValid = user.validatePassword(password);
+        const isPasswordValid = await user.validatePassword(password);
 
         if (isPasswordValid) {
             //Get the Token
@@ -72,5 +73,30 @@ authRouter.post('/logout', (req,res)=>{
     res.status(200).send("User logged out");
 })
 
+authRouter.post('/password', userAuth, async (req, res) => {
+    try {
+        const { oldpass, newpass, confirmpass } = req.body;
+        const user = req.user;
+        const isPasswordValid = await user.validatePassword(oldpass);
+        if (!isPasswordValid) {
+            throw new Error("Old Password is not correct");
+        }
+
+        if (newpass != confirmpass) {
+            throw new Error("New Password and Confirm Password do not match");
+        }
+
+        if (!validator.isStrongPassword(newpass)) {
+            throw new Error("New Password is not strong enough");
+        }
+
+        const passwordHash = await bcrypt.hash(newpass, 10);
+        user.password = passwordHash;
+        await user.save();
+        res.status(200).send("Password updated successfully")
+    } catch (err) {
+        res.status(400).send("Error : " + err.message)
+    }
+})
 
 module.exports = authRouter;
