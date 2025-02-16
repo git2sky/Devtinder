@@ -14,7 +14,7 @@ const userSchema = new Schema({
     emailId: {
         type: String,
         required: true,
-        unique: true,
+        unique: true, // making field unique automatically assigns it a index
         validate: (value) => {
             if (!validator.isEmail(value)) {
                 throw new Error('Invalid Email');

@@ -19,6 +19,8 @@ const connectionRequestSchema = new mongoose.Schema({
     timestamps: true
 });
 
+//compound index on fromUserId and toUserId
+connectionRequestSchema.index({fromUserId : 1 , toUserId : 1});
 //this middleware will be called before db save method is called
 connectionRequestSchema.pre("save" , function(next){
     const connectionRequest = this;
