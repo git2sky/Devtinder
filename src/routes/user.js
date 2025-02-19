@@ -45,4 +45,32 @@ userRouter.get('/user/connections', userAuth, async (req, res) => {
     }
 });
 
+userRouter.get('/feed', userAuth, async (req, res) => {
+    try {
+        const loggedInUser = req.user;
+        const connectionRequestsData = await ConnectionRequest.find({
+            $or: [
+                { toUserId: loggedInUser._id },
+                { fromUserId: loggedInUser._id }
+            ]
+        }).select("fromUserId toUserId");
+        
+        const hiddenUsersFromFeed = new Set();
+        connectionRequestsData.forEach(user =>{
+            hiddenUsersFromFeed.add(user.fromUserId.toString());
+            hiddenUsersFromFeed.add(user.toUserId.toString());
+        });
+        
+        const users = await UserActivation.find({
+            $and : [
+                {_id: { $nin : Array.from(hiddenUsersFromFeed) } },
+                {_id: { $ne : loggedInUser._id } }
+            ]
+        }).select(SAFE_USER_DATA);
+        res.send(users)
+    } catch (err) {
+        res.status(400).send("ERROR : " + err.message);
+    }
+});
+
 module.exports = userRouter;
